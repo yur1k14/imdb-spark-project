@@ -1,2 +1,5 @@
 .venv/
 .idea/
+.tsv
+.csv
+.DS_Store
