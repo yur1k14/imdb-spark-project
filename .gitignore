@@ -1,5 +1,47 @@
+# --- User Custom & Data Files ---
+*.tsv
+*.csv
+*.parquet
+*.log
+data/
+
+# --- Environment & Secrets ---
+.env
 .venv/
+env/
+venv/
+
+# --- Python Core ---
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# --- Distribution / Packaging ---
+build/
+dist/
+*.egg-info/
+*.egg
+wheels/
+
+# --- Testing & Coverage ---
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# --- Data Science & Big Data ---
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Spark / Hadoop
+spark-warehouse/
+metastore_db/
+derby.log
+
+# --- IDEs & OS ---
 .idea/
-.tsv
-.csv
+.vscode/
 .DS_Store
+Thumbs.db
