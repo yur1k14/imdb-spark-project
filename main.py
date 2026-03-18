@@ -1,43 +1,28 @@
-from pyspark.sql import SparkSession
-from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DoubleType
+from operations import (
+    get_high_rated_titles,
+    get_top_genres_by_rating,
+    get_most_frequent_actors_in_top_movies,
+    get_runtime_trends_by_decade
+)
+from extract import (
+    title_basics_df,
+    title_ratings_df,
+    title_principals_df,
+    name_basics_df
+)
 
+print("Топ 10 фільмів з високим рейтингом (мінімум 10 000 голосів)")
+top_movies = get_high_rated_titles(title_basics_df, title_ratings_df)
+top_movies.select("primaryTitle", "startYear", "averageRating", "numVotes").show(10, truncate=False)
 
-def main():
-    # 1. Створення сесії Spark
-    spark = SparkSession.builder \
-        .appName("IMDB-Spark-Project") \
-        .master("local[*]") \
-        .getOrCreate()
+print("Топ жанрів за середнім рейтингом")
+top_genres = get_top_genres_by_rating(title_basics_df, title_ratings_df)
+top_genres.show(10, truncate=False)
 
-    # Встановлюємо рівень логування на WARN, щоб бачити лише важливі повідомлення
-    spark.sparkContext.setLogLevel("WARN")
+print("Актори з найбільшою кількістю ролей у фільмах з рейтингом 8.0+")
+top_actors = get_most_frequent_actors_in_top_movies(title_principals_df, title_ratings_df, name_basics_df)
+top_actors.show(10, truncate=False)
 
-    print("--- Тестовий DataFrame для перевірки налаштувань ---")
-
-    # 2. Створення тестових даних
-    # Використовуємо дані, схожі на структуру IMDB для підготовки до наступного етапу
-    test_data = [
-        ("tt0111161", "The Shawshank Redemption", 1994, 9.3),
-        ("tt0068646", "The Godfather", 1972, 9.2),
-        ("tt0108052", "Schindler's List", 1993, 9.0)
-    ]
-
-    # 3. Визначення простої схеми
-    schema = StructType([
-        StructField("tconst", StringType(), True),
-        StructField("primaryTitle", StringType(), True),
-        StructField("startYear", IntegerType(), True),
-        StructField("averageRating", DoubleType(), True)
-    ])
-
-    # 4. Створення DataFrame
-    df = spark.createDataFrame(data=test_data, schema=schema)
-
-    # 5. Відображення даних
-    df.show()
-
-    # Зупинка сесії
-    spark.stop()
-
-if __name__ == "__main__":
-    main()
+print("Еволюція тривалості фільмів по десятиліттях")
+runtime_trends = get_runtime_trends_by_decade(title_basics_df)
+runtime_trends.show(15)
