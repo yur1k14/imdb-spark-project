@@ -13,6 +13,13 @@ from extract import (
     title_akas_df
 )
 
+from vorobets_questions import run_vorobets_questions
+from lirko_questions import run_lirko_questions
+from poliuga_questions import run_poliuga_questions
+from sydor_questions import run_sydor_questions
+from tymofeiuk_questions import run_tymofeiuk_questions
+from yaremchuk_questions import run_yaremchuk_questions
+
 # Ensure output directories exist
 os.makedirs("results", exist_ok=True)
 os.makedirs("visualizations", exist_ok=True)
@@ -310,11 +317,20 @@ def q6_most_localized_regions_top_movies():
 if __name__ == "__main__":
     # Clear the file first
     open("explain_plans.txt", "w").close()
-    
+
+    # Original questions with visualizations
     q1_top_3_movies_per_genre()
     q2_top_10_directors_by_rating()
     q3_top_5_comedy_per_decade()
     q4_top_5_series_rating_difference()
     q5_top_5_longest_movies_per_genre()
     q6_most_localized_regions_top_movies()
+
+    run_vorobets_questions()
+    run_lirko_questions()
+    run_poliuga_questions()
+    run_sydor_questions()
+    run_tymofeiuk_questions()
+    run_yaremchuk_questions()
+
     print("All tasks completed successfully!")
