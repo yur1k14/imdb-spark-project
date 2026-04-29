@@ -6,6 +6,8 @@ from pyspark.sql.functions import col, split
 
 spark = SparkSession.builder \
     .appName("IMDb DataFrames") \
+    .config("spark.driver.memory", "4g") \
+    .config("spark.executor.memory", "4g") \
     .getOrCreate()
 
 name_basics_df = spark.read \
