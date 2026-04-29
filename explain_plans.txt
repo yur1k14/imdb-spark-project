@@ -1,0 +1,340 @@
+
+=== Q1 Plan ===
+== Parsed Logical Plan ==
+'Filter '`<=`('rank, 3)
++- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32, averageRating#50, numVotes#51, genre#54, rank#55]
+   +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32, averageRating#50, numVotes#51, genre#54, rank#55, rank#55]
+      +- Window [row_number() windowspecdefinition(genre#54, averageRating#50 DESC NULLS LAST, numVotes#51 DESC NULLS LAST, specifiedwindowframe(RowFrame, unboundedpreceding$(), currentrow$())) AS rank#55], [genre#54], [averageRating#50 DESC NULLS LAST, numVotes#51 DESC NULLS LAST]
+         +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32, averageRating#50, numVotes#51, genre#54]
+            +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32, averageRating#50, numVotes#51, genre#54]
+               +- Generate explode(genres#32), false, [genre#54]
+                  +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32, averageRating#50, numVotes#51]
+                     +- Join Inner, (tconst#21 = tconst#49)
+                        :- Filter ((titleType#22 = movie) AND isnotnull(genres#32))
+                        :  +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, split(genres#29, ,, -1) AS genres#32]
+                        :     +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, cast(isAdult#25 as boolean) AS isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#29]
+                        :        +- Relation [tconst#21,titleType#22,primaryTitle#23,originalTitle#24,isAdult#25,startYear#26,endYear#27,runtimeMinutes#28,genres#29] csv
+                        +- Filter (numVotes#51 >= 100000)
+                           +- Relation [tconst#49,averageRating#50,numVotes#51] csv
+
+== Analyzed Logical Plan ==
+tconst: string, titleType: string, primaryTitle: string, originalTitle: string, isAdult: boolean, startYear: int, endYear: int, runtimeMinutes: int, genres: array<string>, averageRating: float, numVotes: int, genre: string, rank: int
+Filter (rank#55 <= 3)
++- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32, averageRating#50, numVotes#51, genre#54, rank#55]
+   +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32, averageRating#50, numVotes#51, genre#54, rank#55, rank#55]
+      +- Window [row_number() windowspecdefinition(genre#54, averageRating#50 DESC NULLS LAST, numVotes#51 DESC NULLS LAST, specifiedwindowframe(RowFrame, unboundedpreceding$(), currentrow$())) AS rank#55], [genre#54], [averageRating#50 DESC NULLS LAST, numVotes#51 DESC NULLS LAST]
+         +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32, averageRating#50, numVotes#51, genre#54]
+            +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32, averageRating#50, numVotes#51, genre#54]
+               +- Generate explode(genres#32), false, [genre#54]
+                  +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32, averageRating#50, numVotes#51]
+                     +- Join Inner, (tconst#21 = tconst#49)
+                        :- Filter ((titleType#22 = movie) AND isnotnull(genres#32))
+                        :  +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, split(genres#29, ,, -1) AS genres#32]
+                        :     +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, cast(isAdult#25 as boolean) AS isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#29]
+                        :        +- Relation [tconst#21,titleType#22,primaryTitle#23,originalTitle#24,isAdult#25,startYear#26,endYear#27,runtimeMinutes#28,genres#29] csv
+                        +- Filter (numVotes#51 >= 100000)
+                           +- Relation [tconst#49,averageRating#50,numVotes#51] csv
+
+== Optimized Logical Plan ==
+Filter (rank#55 <= 3)
++- Window [row_number() windowspecdefinition(genre#54, averageRating#50 DESC NULLS LAST, numVotes#51 DESC NULLS LAST, specifiedwindowframe(RowFrame, unboundedpreceding$(), currentrow$())) AS rank#55], [genre#54], [averageRating#50 DESC NULLS LAST, numVotes#51 DESC NULLS LAST]
+   +- WindowGroupLimit [genre#54], [averageRating#50 DESC NULLS LAST, numVotes#51 DESC NULLS LAST], row_number(), 3
+      +- Generate explode(genres#32), false, [genre#54]
+         +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32, averageRating#50, numVotes#51]
+            +- Join Inner, (tconst#21 = tconst#49)
+               :- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, cast(isAdult#25 as boolean) AS isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, split(genres#29, ,, -1) AS genres#32]
+               :  +- Filter (((isnotnull(titleType#22) AND isnotnull(genres#29)) AND ((titleType#22 = movie) AND isnotnull(split(genres#29, ,, -1)))) AND (isnotnull(tconst#21) AND (size(split(genres#29, ,, -1), false) > 0)))
+               :     +- Relation [tconst#21,titleType#22,primaryTitle#23,originalTitle#24,isAdult#25,startYear#26,endYear#27,runtimeMinutes#28,genres#29] csv
+               +- Filter ((isnotnull(numVotes#51) AND (numVotes#51 >= 100000)) AND isnotnull(tconst#49))
+                  +- Relation [tconst#49,averageRating#50,numVotes#51] csv
+
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- Filter (rank#55 <= 3)
+   +- Window [row_number() windowspecdefinition(genre#54, averageRating#50 DESC NULLS LAST, numVotes#51 DESC NULLS LAST, specifiedwindowframe(RowFrame, unboundedpreceding$(), currentrow$())) AS rank#55], [genre#54], [averageRating#50 DESC NULLS LAST, numVotes#51 DESC NULLS LAST]
+      +- WindowGroupLimit [genre#54], [averageRating#50 DESC NULLS LAST, numVotes#51 DESC NULLS LAST], row_number(), 3, Final
+         +- Sort [genre#54 ASC NULLS FIRST, averageRating#50 DESC NULLS LAST, numVotes#51 DESC NULLS LAST], false, 0
+            +- Exchange hashpartitioning(genre#54, 200), ENSURE_REQUIREMENTS, [plan_id=58]
+               +- WindowGroupLimit [genre#54], [averageRating#50 DESC NULLS LAST, numVotes#51 DESC NULLS LAST], row_number(), 3, Partial
+                  +- Sort [genre#54 ASC NULLS FIRST, averageRating#50 DESC NULLS LAST, numVotes#51 DESC NULLS LAST], false, 0
+                     +- Generate explode(genres#32), [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32, averageRating#50, numVotes#51], false, [genre#54]
+                        +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32, averageRating#50, numVotes#51]
+                           +- BroadcastHashJoin [tconst#21], [tconst#49], Inner, BuildRight, false
+                              :- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, cast(isAdult#25 as boolean) AS isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, split(genres#29, ,, -1) AS genres#32]
+                              :  +- Filter (((((isnotnull(titleType#22) AND isnotnull(genres#29)) AND (titleType#22 = movie)) AND isnotnull(split(genres#29, ,, -1))) AND isnotnull(tconst#21)) AND (size(split(genres#29, ,, -1), false) > 0))
+                              :     +- FileScan csv [tconst#21,titleType#22,primaryTitle#23,originalTitle#24,isAdult#25,startYear#26,endYear#27,runtimeMinutes#28,genres#29] Batched: false, DataFilters: [isnotnull(titleType#22), isnotnull(genres#29), (titleType#22 = movie), isnotnull(split(genres#29..., Format: CSV, Location: InMemoryFileIndex(1 paths)[file:/Users/marko/imdb-spark-project/data/title.basics.tsv.gz], PartitionFilters: [], PushedFilters: [IsNotNull(titleType), IsNotNull(genres), EqualTo(titleType,movie), IsNotNull(tconst)], ReadSchema: struct<tconst:string,titleType:string,primaryTitle:string,originalTitle:string,isAdult:int,startY...
+                              +- BroadcastExchange HashedRelationBroadcastMode(List(input[0, string, false]),false), [plan_id=50]
+                                 +- Filter ((isnotnull(numVotes#51) AND (numVotes#51 >= 100000)) AND isnotnull(tconst#49))
+                                    +- FileScan csv [tconst#49,averageRating#50,numVotes#51] Batched: false, DataFilters: [isnotnull(numVotes#51), (numVotes#51 >= 100000), isnotnull(tconst#49)], Format: CSV, Location: InMemoryFileIndex(1 paths)[file:/Users/marko/imdb-spark-project/data/title.ratings.tsv.gz], PartitionFilters: [], PushedFilters: [IsNotNull(numVotes), GreaterThanOrEqual(numVotes,100000), IsNotNull(tconst)], ReadSchema: struct<tconst:string,averageRating:float,numVotes:int>
+
+
+=== Q2 Plan ===
+== Parsed Logical Plan ==
+GlobalLimit 10
++- LocalLimit 10
+   +- Sort [avg_director_rating#66 DESC NULLS LAST], true
+      +- Project [director#65, avg_director_rating#66, movie_count#67L, primaryName#1, birthYear#2, deathYear#3, primaryProfession#7, knownForTitles#8]
+         +- Join Inner, (director#65 = director#84)
+            :- Filter (movie_count#67L >= cast(5 as bigint))
+            :  +- Aggregate [director#65], [director#65, avg(averageRating#50) AS avg_director_rating#66, count(tconst#33) AS movie_count#67L]
+            :     +- Project [tconst#33, directors#37, writers#38, director#65, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32, averageRating#50, numVotes#51]
+            :        +- Join Inner, (tconst#33 = tconst#21)
+            :           :- Project [tconst#33, directors#37, writers#38, director#65]
+            :           :  +- Generate explode(directors#37), false, [director#65]
+            :           :     +- Project [tconst#33, directors#37, split(writers#35, ,, -1) AS writers#38]
+            :           :        +- Project [tconst#33, split(directors#34, ,, -1) AS directors#37, writers#35]
+            :           :           +- Relation [tconst#33,directors#34,writers#35] csv
+            :           +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32, averageRating#50, numVotes#51]
+            :              +- Join Inner, (tconst#21 = tconst#49)
+            :                 :- Filter (titleType#22 = movie)
+            :                 :  +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, split(genres#29, ,, -1) AS genres#32]
+            :                 :     +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, cast(isAdult#25 as boolean) AS isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#29]
+            :                 :        +- Relation [tconst#21,titleType#22,primaryTitle#23,originalTitle#24,isAdult#25,startYear#26,endYear#27,runtimeMinutes#28,genres#29] csv
+            :                 +- Relation [tconst#49,averageRating#50,numVotes#51] csv
+            +- Project [nconst#0 AS director#84, primaryName#1, birthYear#2, deathYear#3, primaryProfession#7, knownForTitles#8]
+               +- Project [nconst#0, primaryName#1, birthYear#2, deathYear#3, primaryProfession#7, split(knownForTitles#5, ,, -1) AS knownForTitles#8]
+                  +- Project [nconst#0, primaryName#1, birthYear#2, deathYear#3, split(primaryProfession#4, ,, -1) AS primaryProfession#7, knownForTitles#5]
+                     +- Relation [nconst#0,primaryName#1,birthYear#2,deathYear#3,primaryProfession#4,knownForTitles#5] csv
+
+== Analyzed Logical Plan ==
+director: string, avg_director_rating: double, movie_count: bigint, primaryName: string, birthYear: int, deathYear: int, primaryProfession: array<string>, knownForTitles: array<string>
+GlobalLimit 10
++- LocalLimit 10
+   +- Sort [avg_director_rating#66 DESC NULLS LAST], true
+      +- Project [director#65, avg_director_rating#66, movie_count#67L, primaryName#1, birthYear#2, deathYear#3, primaryProfession#7, knownForTitles#8]
+         +- Join Inner, (director#65 = director#84)
+            :- Filter (movie_count#67L >= cast(5 as bigint))
+            :  +- Aggregate [director#65], [director#65, avg(averageRating#50) AS avg_director_rating#66, count(tconst#33) AS movie_count#67L]
+            :     +- Project [tconst#33, directors#37, writers#38, director#65, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32, averageRating#50, numVotes#51]
+            :        +- Join Inner, (tconst#33 = tconst#21)
+            :           :- Project [tconst#33, directors#37, writers#38, director#65]
+            :           :  +- Generate explode(directors#37), false, [director#65]
+            :           :     +- Project [tconst#33, directors#37, split(writers#35, ,, -1) AS writers#38]
+            :           :        +- Project [tconst#33, split(directors#34, ,, -1) AS directors#37, writers#35]
+            :           :           +- Relation [tconst#33,directors#34,writers#35] csv
+            :           +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32, averageRating#50, numVotes#51]
+            :              +- Join Inner, (tconst#21 = tconst#49)
+            :                 :- Filter (titleType#22 = movie)
+            :                 :  +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, split(genres#29, ,, -1) AS genres#32]
+            :                 :     +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, cast(isAdult#25 as boolean) AS isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#29]
+            :                 :        +- Relation [tconst#21,titleType#22,primaryTitle#23,originalTitle#24,isAdult#25,startYear#26,endYear#27,runtimeMinutes#28,genres#29] csv
+            :                 +- Relation [tconst#49,averageRating#50,numVotes#51] csv
+            +- Project [nconst#0 AS director#84, primaryName#1, birthYear#2, deathYear#3, primaryProfession#7, knownForTitles#8]
+               +- Project [nconst#0, primaryName#1, birthYear#2, deathYear#3, primaryProfession#7, split(knownForTitles#5, ,, -1) AS knownForTitles#8]
+                  +- Project [nconst#0, primaryName#1, birthYear#2, deathYear#3, split(primaryProfession#4, ,, -1) AS primaryProfession#7, knownForTitles#5]
+                     +- Relation [nconst#0,primaryName#1,birthYear#2,deathYear#3,primaryProfession#4,knownForTitles#5] csv
+
+== Optimized Logical Plan ==
+GlobalLimit 10
++- LocalLimit 10
+   +- Sort [avg_director_rating#66 DESC NULLS LAST], true
+      +- Project [director#65, avg_director_rating#66, movie_count#67L, primaryName#1, birthYear#2, deathYear#3, primaryProfession#7, knownForTitles#8]
+         +- Join Inner, (director#65 = director#84)
+            :- Filter (movie_count#67L >= 5)
+            :  +- Aggregate [director#65], [director#65, avg(averageRating#50) AS avg_director_rating#66, count(tconst#33) AS movie_count#67L]
+            :     +- Project [tconst#33, director#65, averageRating#50]
+            :        +- Join Inner, (tconst#33 = tconst#21)
+            :           :- Generate explode(directors#37), [1], false, [director#65]
+            :           :  +- Project [tconst#33, split(directors#34, ,, -1) AS directors#37]
+            :           :     +- Filter (((size(split(directors#34, ,, -1), false) > 0) AND isnotnull(split(directors#34, ,, -1))) AND isnotnull(tconst#33))
+            :           :        +- Relation [tconst#33,directors#34,writers#35] csv
+            :           +- Project [tconst#21, averageRating#50]
+            :              +- Join Inner, (tconst#21 = tconst#49)
+            :                 :- Project [tconst#21]
+            :                 :  +- Filter ((isnotnull(titleType#22) AND (titleType#22 = movie)) AND isnotnull(tconst#21))
+            :                 :     +- Relation [tconst#21,titleType#22,primaryTitle#23,originalTitle#24,isAdult#25,startYear#26,endYear#27,runtimeMinutes#28,genres#29] csv
+            :                 +- Project [tconst#49, averageRating#50]
+            :                    +- Filter isnotnull(tconst#49)
+            :                       +- Relation [tconst#49,averageRating#50,numVotes#51] csv
+            +- Project [nconst#0 AS director#84, primaryName#1, birthYear#2, deathYear#3, split(primaryProfession#4, ,, -1) AS primaryProfession#7, split(knownForTitles#5, ,, -1) AS knownForTitles#8]
+               +- Filter isnotnull(nconst#0)
+                  +- Relation [nconst#0,primaryName#1,birthYear#2,deathYear#3,primaryProfession#4,knownForTitles#5] csv
+
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- TakeOrderedAndProject(limit=10, orderBy=[avg_director_rating#66 DESC NULLS LAST], output=[director#65,avg_director_rating#66,movie_count#67L,primaryName#1,birthYear#2,deathYear#3,primaryProfession#7,knownForTitles#8])
+   +- Project [director#65, avg_director_rating#66, movie_count#67L, primaryName#1, birthYear#2, deathYear#3, primaryProfession#7, knownForTitles#8]
+      +- SortMergeJoin [director#65], [director#84], Inner
+         :- Sort [director#65 ASC NULLS FIRST], false, 0
+         :  +- Filter (movie_count#67L >= 5)
+         :     +- HashAggregate(keys=[director#65], functions=[avg(averageRating#50), count(tconst#33)], output=[director#65, avg_director_rating#66, movie_count#67L])
+         :        +- Exchange hashpartitioning(director#65, 200), ENSURE_REQUIREMENTS, [plan_id=383]
+         :           +- HashAggregate(keys=[director#65], functions=[partial_avg(averageRating#50), partial_count(tconst#33)], output=[director#65, sum#88, count#89L, count#90L])
+         :              +- Project [tconst#33, director#65, averageRating#50]
+         :                 +- SortMergeJoin [tconst#33], [tconst#21], Inner
+         :                    :- Sort [tconst#33 ASC NULLS FIRST], false, 0
+         :                    :  +- Exchange hashpartitioning(tconst#33, 200), ENSURE_REQUIREMENTS, [plan_id=375]
+         :                    :     +- Generate explode(directors#37), [tconst#33], false, [director#65]
+         :                    :        +- Project [tconst#33, split(directors#34, ,, -1) AS directors#37]
+         :                    :           +- Filter (((size(split(directors#34, ,, -1), false) > 0) AND isnotnull(split(directors#34, ,, -1))) AND isnotnull(tconst#33))
+         :                    :              +- FileScan csv [tconst#33,directors#34] Batched: false, DataFilters: [(size(split(directors#34, ,, -1), false) > 0), isnotnull(split(directors#34, ,, -1)), isnotnull(..., Format: CSV, Location: InMemoryFileIndex(1 paths)[file:/Users/marko/imdb-spark-project/data/title.crew.tsv.gz], PartitionFilters: [], PushedFilters: [IsNotNull(tconst)], ReadSchema: struct<tconst:string,directors:string>
+         :                    +- Sort [tconst#21 ASC NULLS FIRST], false, 0
+         :                       +- Exchange hashpartitioning(tconst#21, 200), ENSURE_REQUIREMENTS, [plan_id=376]
+         :                          +- Project [tconst#21, averageRating#50]
+         :                             +- BroadcastHashJoin [tconst#21], [tconst#49], Inner, BuildRight, false
+         :                                :- Project [tconst#21]
+         :                                :  +- Filter ((isnotnull(titleType#22) AND (titleType#22 = movie)) AND isnotnull(tconst#21))
+         :                                :     +- FileScan csv [tconst#21,titleType#22] Batched: false, DataFilters: [isnotnull(titleType#22), (titleType#22 = movie), isnotnull(tconst#21)], Format: CSV, Location: InMemoryFileIndex(1 paths)[file:/Users/marko/imdb-spark-project/data/title.basics.tsv.gz], PartitionFilters: [], PushedFilters: [IsNotNull(titleType), EqualTo(titleType,movie), IsNotNull(tconst)], ReadSchema: struct<tconst:string,titleType:string>
+         :                                +- BroadcastExchange HashedRelationBroadcastMode(List(input[0, string, false]),false), [plan_id=370]
+         :                                   +- Filter isnotnull(tconst#49)
+         :                                      +- FileScan csv [tconst#49,averageRating#50] Batched: false, DataFilters: [isnotnull(tconst#49)], Format: CSV, Location: InMemoryFileIndex(1 paths)[file:/Users/marko/imdb-spark-project/data/title.ratings.tsv.gz], PartitionFilters: [], PushedFilters: [IsNotNull(tconst)], ReadSchema: struct<tconst:string,averageRating:float>
+         +- Sort [director#84 ASC NULLS FIRST], false, 0
+            +- Exchange hashpartitioning(director#84, 200), ENSURE_REQUIREMENTS, [plan_id=388]
+               +- Project [nconst#0 AS director#84, primaryName#1, birthYear#2, deathYear#3, split(primaryProfession#4, ,, -1) AS primaryProfession#7, split(knownForTitles#5, ,, -1) AS knownForTitles#8]
+                  +- Filter isnotnull(nconst#0)
+                     +- FileScan csv [nconst#0,primaryName#1,birthYear#2,deathYear#3,primaryProfession#4,knownForTitles#5] Batched: false, DataFilters: [isnotnull(nconst#0)], Format: CSV, Location: InMemoryFileIndex(1 paths)[file:/Users/marko/imdb-spark-project/data/name.basics.tsv.gz], PartitionFilters: [], PushedFilters: [IsNotNull(nconst)], ReadSchema: struct<nconst:string,primaryName:string,birthYear:int,deathYear:int,primaryProfession:string,know...
+
+
+=== Q3 (Group 3: Q16) Plan ===
+== Parsed Logical Plan ==
+'Sort ['decade ASC NULLS FIRST, 'rank ASC NULLS FIRST], true
++- Filter (rank#112 <= 5)
+   +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32, decade#111, averageRating#50, numVotes#51, rank#112]
+      +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32, decade#111, averageRating#50, numVotes#51, rank#112, rank#112]
+         +- Window [row_number() windowspecdefinition(decade#111, averageRating#50 DESC NULLS LAST, numVotes#51 DESC NULLS LAST, specifiedwindowframe(RowFrame, unboundedpreceding$(), currentrow$())) AS rank#112], [decade#111], [averageRating#50 DESC NULLS LAST, numVotes#51 DESC NULLS LAST]
+            +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32, decade#111, averageRating#50, numVotes#51]
+               +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32, decade#111, averageRating#50, numVotes#51]
+                  +- Join Inner, (tconst#21 = tconst#49)
+                     :- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32, (startYear#26 - (startYear#26 % 10)) AS decade#111]
+                     :  +- Filter (((titleType#22 = movie) AND isnotnull(startYear#26)) AND array_contains(genres#32, Comedy))
+                     :     +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, split(genres#29, ,, -1) AS genres#32]
+                     :        +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, cast(isAdult#25 as boolean) AS isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#29]
+                     :           +- Relation [tconst#21,titleType#22,primaryTitle#23,originalTitle#24,isAdult#25,startYear#26,endYear#27,runtimeMinutes#28,genres#29] csv
+                     +- Filter (numVotes#51 >= 1000)
+                        +- Relation [tconst#49,averageRating#50,numVotes#51] csv
+
+== Analyzed Logical Plan ==
+tconst: string, titleType: string, primaryTitle: string, originalTitle: string, isAdult: boolean, startYear: int, endYear: int, runtimeMinutes: int, genres: array<string>, decade: int, averageRating: float, numVotes: int, rank: int
+Sort [decade#111 ASC NULLS FIRST, rank#112 ASC NULLS FIRST], true
++- Filter (rank#112 <= 5)
+   +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32, decade#111, averageRating#50, numVotes#51, rank#112]
+      +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32, decade#111, averageRating#50, numVotes#51, rank#112, rank#112]
+         +- Window [row_number() windowspecdefinition(decade#111, averageRating#50 DESC NULLS LAST, numVotes#51 DESC NULLS LAST, specifiedwindowframe(RowFrame, unboundedpreceding$(), currentrow$())) AS rank#112], [decade#111], [averageRating#50 DESC NULLS LAST, numVotes#51 DESC NULLS LAST]
+            +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32, decade#111, averageRating#50, numVotes#51]
+               +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32, decade#111, averageRating#50, numVotes#51]
+                  +- Join Inner, (tconst#21 = tconst#49)
+                     :- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32, (startYear#26 - (startYear#26 % 10)) AS decade#111]
+                     :  +- Filter (((titleType#22 = movie) AND isnotnull(startYear#26)) AND array_contains(genres#32, Comedy))
+                     :     +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, split(genres#29, ,, -1) AS genres#32]
+                     :        +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, cast(isAdult#25 as boolean) AS isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#29]
+                     :           +- Relation [tconst#21,titleType#22,primaryTitle#23,originalTitle#24,isAdult#25,startYear#26,endYear#27,runtimeMinutes#28,genres#29] csv
+                     +- Filter (numVotes#51 >= 1000)
+                        +- Relation [tconst#49,averageRating#50,numVotes#51] csv
+
+== Optimized Logical Plan ==
+Sort [decade#111 ASC NULLS FIRST, rank#112 ASC NULLS FIRST], true
++- Filter (rank#112 <= 5)
+   +- Window [row_number() windowspecdefinition(decade#111, averageRating#50 DESC NULLS LAST, numVotes#51 DESC NULLS LAST, specifiedwindowframe(RowFrame, unboundedpreceding$(), currentrow$())) AS rank#112], [decade#111], [averageRating#50 DESC NULLS LAST, numVotes#51 DESC NULLS LAST]
+      +- WindowGroupLimit [decade#111], [averageRating#50 DESC NULLS LAST, numVotes#51 DESC NULLS LAST], row_number(), 5
+         +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32, decade#111, averageRating#50, numVotes#51]
+            +- Join Inner, (tconst#21 = tconst#49)
+               :- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, cast(isAdult#25 as boolean) AS isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, split(genres#29, ,, -1) AS genres#32, (startYear#26 - (startYear#26 % 10)) AS decade#111]
+               :  +- Filter (((isnotnull(titleType#22) AND isnotnull(genres#29)) AND (((titleType#22 = movie) AND isnotnull(startYear#26)) AND array_contains(split(genres#29, ,, -1), Comedy))) AND isnotnull(tconst#21))
+               :     +- Relation [tconst#21,titleType#22,primaryTitle#23,originalTitle#24,isAdult#25,startYear#26,endYear#27,runtimeMinutes#28,genres#29] csv
+               +- Filter ((isnotnull(numVotes#51) AND (numVotes#51 >= 1000)) AND isnotnull(tconst#49))
+                  +- Relation [tconst#49,averageRating#50,numVotes#51] csv
+
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- Sort [decade#111 ASC NULLS FIRST, rank#112 ASC NULLS FIRST], true, 0
+   +- Exchange rangepartitioning(decade#111 ASC NULLS FIRST, rank#112 ASC NULLS FIRST, 200), ENSURE_REQUIREMENTS, [plan_id=983]
+      +- Filter (rank#112 <= 5)
+         +- Window [row_number() windowspecdefinition(decade#111, averageRating#50 DESC NULLS LAST, numVotes#51 DESC NULLS LAST, specifiedwindowframe(RowFrame, unboundedpreceding$(), currentrow$())) AS rank#112], [decade#111], [averageRating#50 DESC NULLS LAST, numVotes#51 DESC NULLS LAST]
+            +- WindowGroupLimit [decade#111], [averageRating#50 DESC NULLS LAST, numVotes#51 DESC NULLS LAST], row_number(), 5, Final
+               +- Sort [decade#111 ASC NULLS FIRST, averageRating#50 DESC NULLS LAST, numVotes#51 DESC NULLS LAST], false, 0
+                  +- Exchange hashpartitioning(decade#111, 200), ENSURE_REQUIREMENTS, [plan_id=977]
+                     +- WindowGroupLimit [decade#111], [averageRating#50 DESC NULLS LAST, numVotes#51 DESC NULLS LAST], row_number(), 5, Partial
+                        +- Sort [decade#111 ASC NULLS FIRST, averageRating#50 DESC NULLS LAST, numVotes#51 DESC NULLS LAST], false, 0
+                           +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32, decade#111, averageRating#50, numVotes#51]
+                              +- BroadcastHashJoin [tconst#21], [tconst#49], Inner, BuildRight, false
+                                 :- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, cast(isAdult#25 as boolean) AS isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, split(genres#29, ,, -1) AS genres#32, (startYear#26 - (startYear#26 % 10)) AS decade#111]
+                                 :  +- Filter (((((isnotnull(titleType#22) AND isnotnull(genres#29)) AND (titleType#22 = movie)) AND isnotnull(startYear#26)) AND array_contains(split(genres#29, ,, -1), Comedy)) AND isnotnull(tconst#21))
+                                 :     +- FileScan csv [tconst#21,titleType#22,primaryTitle#23,originalTitle#24,isAdult#25,startYear#26,endYear#27,runtimeMinutes#28,genres#29] Batched: false, DataFilters: [isnotnull(titleType#22), isnotnull(genres#29), (titleType#22 = movie), isnotnull(startYear#26), ..., Format: CSV, Location: InMemoryFileIndex(1 paths)[file:/Users/marko/imdb-spark-project/data/title.basics.tsv.gz], PartitionFilters: [], PushedFilters: [IsNotNull(titleType), IsNotNull(genres), EqualTo(titleType,movie), IsNotNull(startYear), IsNotNu..., ReadSchema: struct<tconst:string,titleType:string,primaryTitle:string,originalTitle:string,isAdult:int,startY...
+                                 +- BroadcastExchange HashedRelationBroadcastMode(List(input[0, string, false]),false), [plan_id=970]
+                                    +- Filter ((isnotnull(numVotes#51) AND (numVotes#51 >= 1000)) AND isnotnull(tconst#49))
+                                       +- FileScan csv [tconst#49,averageRating#50,numVotes#51] Batched: false, DataFilters: [isnotnull(numVotes#51), (numVotes#51 >= 1000), isnotnull(tconst#49)], Format: CSV, Location: InMemoryFileIndex(1 paths)[file:/Users/marko/imdb-spark-project/data/title.ratings.tsv.gz], PartitionFilters: [], PushedFilters: [IsNotNull(numVotes), GreaterThanOrEqual(numVotes,1000), IsNotNull(tconst)], ReadSchema: struct<tconst:string,averageRating:float,numVotes:int>
+
+
+=== Q4 Plan ===
+== Parsed Logical Plan ==
+GlobalLimit 5
++- LocalLimit 5
+   +- Sort [rating_diff#135 DESC NULLS LAST], true
+      +- Project [parentTconst#40, max_rating#123, min_rating#124, episode_count#125L, rating_diff#135, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32]
+         +- Join Inner, (parentTconst#40 = parentTconst#136)
+            :- Project [parentTconst#40, max_rating#123, min_rating#124, episode_count#125L, abs((max_rating#123 - min_rating#124)) AS rating_diff#135]
+            :  +- Filter (episode_count#125L >= cast(10 as bigint))
+            :     +- Aggregate [parentTconst#40], [parentTconst#40, max(averageRating#50) AS max_rating#123, min(averageRating#50) AS min_rating#124, count(tconst#39) AS episode_count#125L]
+            :        +- Project [tconst#39, parentTconst#40, seasonNumber#41, episodeNumber#42, averageRating#50, numVotes#51]
+            :           +- Join Inner, (tconst#39 = tconst#49)
+            :              :- Relation [tconst#39,parentTconst#40,seasonNumber#41,episodeNumber#42] csv
+            :              +- Relation [tconst#49,averageRating#50,numVotes#51] csv
+            +- Project [tconst#21 AS parentTconst#136, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32]
+               +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, split(genres#29, ,, -1) AS genres#32]
+                  +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, cast(isAdult#25 as boolean) AS isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#29]
+                     +- Relation [tconst#21,titleType#22,primaryTitle#23,originalTitle#24,isAdult#25,startYear#26,endYear#27,runtimeMinutes#28,genres#29] csv
+
+== Analyzed Logical Plan ==
+parentTconst: string, max_rating: float, min_rating: float, episode_count: bigint, rating_diff: float, titleType: string, primaryTitle: string, originalTitle: string, isAdult: boolean, startYear: int, endYear: int, runtimeMinutes: int, genres: array<string>
+GlobalLimit 5
++- LocalLimit 5
+   +- Sort [rating_diff#135 DESC NULLS LAST], true
+      +- Project [parentTconst#40, max_rating#123, min_rating#124, episode_count#125L, rating_diff#135, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32]
+         +- Join Inner, (parentTconst#40 = parentTconst#136)
+            :- Project [parentTconst#40, max_rating#123, min_rating#124, episode_count#125L, abs((max_rating#123 - min_rating#124)) AS rating_diff#135]
+            :  +- Filter (episode_count#125L >= cast(10 as bigint))
+            :     +- Aggregate [parentTconst#40], [parentTconst#40, max(averageRating#50) AS max_rating#123, min(averageRating#50) AS min_rating#124, count(tconst#39) AS episode_count#125L]
+            :        +- Project [tconst#39, parentTconst#40, seasonNumber#41, episodeNumber#42, averageRating#50, numVotes#51]
+            :           +- Join Inner, (tconst#39 = tconst#49)
+            :              :- Relation [tconst#39,parentTconst#40,seasonNumber#41,episodeNumber#42] csv
+            :              +- Relation [tconst#49,averageRating#50,numVotes#51] csv
+            +- Project [tconst#21 AS parentTconst#136, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32]
+               +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, split(genres#29, ,, -1) AS genres#32]
+                  +- Project [tconst#21, titleType#22, primaryTitle#23, originalTitle#24, cast(isAdult#25 as boolean) AS isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#29]
+                     +- Relation [tconst#21,titleType#22,primaryTitle#23,originalTitle#24,isAdult#25,startYear#26,endYear#27,runtimeMinutes#28,genres#29] csv
+
+== Optimized Logical Plan ==
+GlobalLimit 5
++- LocalLimit 5
+   +- Sort [rating_diff#135 DESC NULLS LAST], true
+      +- Project [parentTconst#40, max_rating#123, min_rating#124, episode_count#125L, rating_diff#135, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32]
+         +- Join Inner, (parentTconst#40 = parentTconst#136)
+            :- Project [parentTconst#40, max_rating#123, min_rating#124, episode_count#125L, abs((max_rating#123 - min_rating#124)) AS rating_diff#135]
+            :  +- Filter (episode_count#125L >= 10)
+            :     +- Aggregate [parentTconst#40], [parentTconst#40, max(averageRating#50) AS max_rating#123, min(averageRating#50) AS min_rating#124, count(tconst#39) AS episode_count#125L]
+            :        +- Project [tconst#39, parentTconst#40, averageRating#50]
+            :           +- Join Inner, (tconst#39 = tconst#49)
+            :              :- Project [tconst#39, parentTconst#40]
+            :              :  +- Filter (isnotnull(tconst#39) AND isnotnull(parentTconst#40))
+            :              :     +- Relation [tconst#39,parentTconst#40,seasonNumber#41,episodeNumber#42] csv
+            :              +- Project [tconst#49, averageRating#50]
+            :                 +- Filter isnotnull(tconst#49)
+            :                    +- Relation [tconst#49,averageRating#50,numVotes#51] csv
+            +- Project [tconst#21 AS parentTconst#136, titleType#22, primaryTitle#23, originalTitle#24, cast(isAdult#25 as boolean) AS isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, split(genres#29, ,, -1) AS genres#32]
+               +- Filter isnotnull(tconst#21)
+                  +- Relation [tconst#21,titleType#22,primaryTitle#23,originalTitle#24,isAdult#25,startYear#26,endYear#27,runtimeMinutes#28,genres#29] csv
+
+== Physical Plan ==
+AdaptiveSparkPlan isFinalPlan=false
++- TakeOrderedAndProject(limit=5, orderBy=[rating_diff#135 DESC NULLS LAST], output=[parentTconst#40,max_rating#123,min_rating#124,episode_count#125L,rating_diff#135,titleType#22,primaryTitle#23,originalTitle#24,isAdult#31,startYear#26,endYear#27,runtimeMinutes#28,genres#32])
+   +- Project [parentTconst#40, max_rating#123, min_rating#124, episode_count#125L, rating_diff#135, titleType#22, primaryTitle#23, originalTitle#24, isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, genres#32]
+      +- SortMergeJoin [parentTconst#40], [parentTconst#136], Inner
+         :- Sort [parentTconst#40 ASC NULLS FIRST], false, 0
+         :  +- Project [parentTconst#40, max_rating#123, min_rating#124, episode_count#125L, abs((max_rating#123 - min_rating#124)) AS rating_diff#135]
+         :     +- Filter (episode_count#125L >= 10)
+         :        +- HashAggregate(keys=[parentTconst#40], functions=[max(averageRating#50), min(averageRating#50), count(tconst#39)], output=[parentTconst#40, max_rating#123, min_rating#124, episode_count#125L])
+         :           +- Exchange hashpartitioning(parentTconst#40, 200), ENSURE_REQUIREMENTS, [plan_id=1349]
+         :              +- HashAggregate(keys=[parentTconst#40], functions=[partial_max(averageRating#50), partial_min(averageRating#50), partial_count(tconst#39)], output=[parentTconst#40, max#140, min#141, count#142L])
+         :                 +- Project [tconst#39, parentTconst#40, averageRating#50]
+         :                    +- BroadcastHashJoin [tconst#39], [tconst#49], Inner, BuildRight, false
+         :                       :- Filter (isnotnull(tconst#39) AND isnotnull(parentTconst#40))
+         :                       :  +- FileScan csv [tconst#39,parentTconst#40] Batched: false, DataFilters: [isnotnull(tconst#39), isnotnull(parentTconst#40)], Format: CSV, Location: InMemoryFileIndex(1 paths)[file:/Users/marko/imdb-spark-project/data/title.episode.tsv.gz], PartitionFilters: [], PushedFilters: [IsNotNull(tconst), IsNotNull(parentTconst)], ReadSchema: struct<tconst:string,parentTconst:string>
+         :                       +- BroadcastExchange HashedRelationBroadcastMode(List(input[0, string, false]),false), [plan_id=1344]
+         :                          +- Filter isnotnull(tconst#49)
+         :                             +- FileScan csv [tconst#49,averageRating#50] Batched: false, DataFilters: [isnotnull(tconst#49)], Format: CSV, Location: InMemoryFileIndex(1 paths)[file:/Users/marko/imdb-spark-project/data/title.ratings.tsv.gz], PartitionFilters: [], PushedFilters: [IsNotNull(tconst)], ReadSchema: struct<tconst:string,averageRating:float>
+         +- Sort [parentTconst#136 ASC NULLS FIRST], false, 0
+            +- Exchange hashpartitioning(parentTconst#136, 200), ENSURE_REQUIREMENTS, [plan_id=1355]
+               +- Project [tconst#21 AS parentTconst#136, titleType#22, primaryTitle#23, originalTitle#24, cast(isAdult#25 as boolean) AS isAdult#31, startYear#26, endYear#27, runtimeMinutes#28, split(genres#29, ,, -1) AS genres#32]
+                  +- Filter isnotnull(tconst#21)
+                     +- FileScan csv [tconst#21,titleType#22,primaryTitle#23,originalTitle#24,isAdult#25,startYear#26,endYear#27,runtimeMinutes#28,genres#29] Batched: false, DataFilters: [isnotnull(tconst#21)], Format: CSV, Location: InMemoryFileIndex(1 paths)[file:/Users/marko/imdb-spark-project/data/title.basics.tsv.gz], PartitionFilters: [], PushedFilters: [IsNotNull(tconst)], ReadSchema: struct<tconst:string,titleType:string,primaryTitle:string,originalTitle:string,isAdult:int,startY...
+
